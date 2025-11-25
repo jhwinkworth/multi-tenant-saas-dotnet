@@ -6,8 +6,8 @@ public class Subscription
     public Guid TenantId { get; set; }
     public Guid PlanId { get; set; }  // Foreign key to Plan
 
-    public DateTime StartedAt { get; set; } = DateTime.UtcNow;
-    public DateTime? ExpiresAt { get; set; }
+    public DateTime StartDate { get; set; } = DateTime.UtcNow;
+    public DateTime? EndDate { get; set; }
 
     // Navigation
     public Tenant Tenant { get; set; }

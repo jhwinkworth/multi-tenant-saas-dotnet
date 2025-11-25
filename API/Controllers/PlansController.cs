@@ -1,62 +1,86 @@
-﻿using Domain.Entities;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Application.Services;
+using Application.DTOs.Plan;
+using Domain.Entities;
 
-[ApiController]
-[Route("api/[controller]")]
-public class PlansController : ControllerBase
+namespace Api.Controllers
 {
-    private readonly AppDbContext _context;
-
-    public PlansController(AppDbContext context) => _context = context;
-
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<Plan>>> GetPlans() =>
-        await _context.Plans.Where(p => p.IsActive).ToListAsync();
-
-    [HttpGet("{id}")]
-    public async Task<ActionResult<Plan>> GetPlan(Guid id)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class PlansController : ControllerBase
     {
-        var plan = await _context.Plans.FindAsync(id);
-        return plan == null ? NotFound() : plan;
-    }
+        private readonly PlanService _planService;
 
-    [Authorize(Roles = "Admin")]
-    [HttpPost]
-    public async Task<ActionResult<Plan>> CreatePlan(Plan plan)
-    {
-        _context.Plans.Add(plan);
-        await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetPlan), new { id = plan.Id }, plan);
-    }
-
-    [Authorize(Roles = "Admin")]
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdatePlan(Guid id, Plan plan)
-    {
-        if (id != plan.Id) return BadRequest();
-        _context.Entry(plan).State = EntityState.Modified;
-
-        try { await _context.SaveChangesAsync(); }
-        catch (DbUpdateConcurrencyException)
+        public PlansController(PlanService planService)
         {
-            if (!_context.Plans.Any(p => p.Id == id)) return NotFound();
-            throw;
+            _planService = planService;
         }
 
-        return NoContent();
-    }
+        [HttpGet]
+        public ActionResult<List<PlanDto>> GetAll()
+        {
+            var plans = _planService.GetAllPlans();
+            var dto = plans.Select(p => new PlanDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                PricePerMonth = p.PricePerMonth,
+                IsActive = p.IsActive
+            }).ToList();
+            return Ok(dto);
+        }
 
-    [Authorize(Roles = "Admin")]
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeletePlan(Guid id)
-    {
-        var plan = await _context.Plans.FindAsync(id);
-        if (plan == null) return NotFound();
+        [HttpGet("{id}")]
+        public ActionResult<PlanDto> GetById(Guid id)
+        {
+            var plan = _planService.GetPlanById(id);
+            if (plan == null) return NotFound();
 
-        _context.Plans.Remove(plan);
-        await _context.SaveChangesAsync();
-        return NoContent();
+            return new PlanDto
+            {
+                Id = plan.Id,
+                Name = plan.Name,
+                PricePerMonth = plan.PricePerMonth,
+                IsActive = plan.IsActive
+            };
+        }
+
+        [HttpPost]
+        public ActionResult<PlanDto> Create([FromBody] CreatePlanDto dto)
+        {
+            var plan = _planService.CreatePlan(dto.Name, dto.PricePerMonth, dto.IsActive);
+
+            return CreatedAtAction(nameof(GetById), new { id = plan.Id }, new PlanDto
+            {
+                Id = plan.Id,
+                Name = plan.Name,
+                PricePerMonth = plan.PricePerMonth,
+                IsActive = plan.IsActive
+            });
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Update(Guid id, [FromBody] CreatePlanDto dto)
+        {
+            var plan = _planService.GetPlanById(id);
+            if (plan == null) return NotFound();
+
+            plan.Name = dto.Name;
+            plan.PricePerMonth = dto.PricePerMonth;
+            plan.IsActive = dto.IsActive;
+
+            _planService.UpdatePlan(plan);
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(Guid id)
+        {
+            var plan = _planService.GetPlanById(id);
+            if (plan == null) return NotFound();
+
+            _planService.DeletePlan(plan);
+            return NoContent();
+        }
     }
 }

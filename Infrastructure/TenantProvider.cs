@@ -1,32 +1,16 @@
-﻿using Microsoft.AspNetCore.Http;
-using System;
-using System.Linq;
+﻿using Application.Interfaces;
 
-public interface ITenantProvider
+namespace Infrastructure.Tenancy
 {
-    Guid CurrentTenantId { get; }
-}
-
-public class TenantProvider : ITenantProvider
-{
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    public TenantProvider(IHttpContextAccessor httpContextAccessor)
+    public class TenantProvider : ITenantProvider
     {
-        _httpContextAccessor = httpContextAccessor;
-    }
+        private Guid _tenantId = Guid.Empty;
 
-    public Guid CurrentTenantId
-    {
-        get
+        public Guid TenantId => _tenantId;
+
+        public void SetTenant(Guid tenantId)
         {
-            var claim = _httpContextAccessor.HttpContext?.User
-                .Claims.FirstOrDefault(c => c.Type == "TenantId");
-
-            if (claim == null)
-                throw new Exception("TenantId claim not found. Ensure JWT is valid and TenantId is included.");
-
-            return Guid.Parse(claim.Value);
+            _tenantId = tenantId;
         }
     }
 }

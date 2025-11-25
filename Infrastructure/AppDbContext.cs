@@ -1,5 +1,6 @@
 ﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Application.Interfaces;
 
 public class AppDbContext : DbContext
 {
@@ -11,7 +12,7 @@ public class AppDbContext : DbContext
         _tenantProvider = tenantProvider;
     }
 
-    public Guid CurrentTenantId => _tenantProvider.CurrentTenantId;
+    public Guid CurrentTenantId => _tenantProvider.TenantId;
 
     public DbSet<Tenant> Tenants { get; set; }
     public DbSet<Project> Projects { get; set; }
@@ -25,11 +26,9 @@ public class AppDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         // Global query filters for multi-tenancy
-        modelBuilder.Entity<Project>().HasQueryFilter(p => p.TenantId == CurrentTenantId);
-        modelBuilder.Entity<TaskItem>().HasQueryFilter(t => t.Project.TenantId == CurrentTenantId);
-        modelBuilder.Entity<User>().HasQueryFilter(u => u.TenantId == CurrentTenantId);
-        modelBuilder.Entity<Subscription>().HasQueryFilter(s => s.TenantId == CurrentTenantId);
-
-        // Plans can be global or tenant-specific depending on your SaaS model
+        modelBuilder.Entity<Project>().HasQueryFilter(p => p.TenantId == _tenantProvider.TenantId);
+        modelBuilder.Entity<TaskItem>().HasQueryFilter(t => t.Project.TenantId == _tenantProvider.TenantId);
+        modelBuilder.Entity<User>().HasQueryFilter(u => u.TenantId == _tenantProvider.TenantId);
+        modelBuilder.Entity<Subscription>().HasQueryFilter(s => s.TenantId == _tenantProvider.TenantId);
     }
 }

@@ -1,67 +1,89 @@
-﻿using Domain.Entities;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Application.Services;
+using Application.DTOs.Subscription;
+using Domain.Entities;
 
-[Authorize]
-[ApiController]
-[Route("api/[controller]")]
-public class SubscriptionsController : ControllerBase
+namespace Api.Controllers
 {
-    private readonly AppDbContext _context;
-
-    public SubscriptionsController(AppDbContext context) => _context = context;
-
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<Subscription>>> GetSubscriptions() =>
-        await _context.Subscriptions
-            .Include(s => s.Plan)
-            .ToListAsync();
-
-    [HttpGet("{id}")]
-    public async Task<ActionResult<Subscription>> GetSubscription(Guid id)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class SubscriptionsController : ControllerBase
     {
-        var subscription = await _context.Subscriptions
-            .Include(s => s.Plan)
-            .FirstOrDefaultAsync(s => s.Id == id);
-        return subscription == null ? NotFound() : subscription;
-    }
+        private readonly SubscriptionService _subscriptionService;
 
-    [HttpPost]
-    public async Task<ActionResult<Subscription>> CreateSubscription(Subscription subscription)
-    {
-        subscription.TenantId = _context.CurrentTenantId;
-        _context.Subscriptions.Add(subscription);
-        await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetSubscription), new { id = subscription.Id }, subscription);
-    }
-
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateSubscription(Guid id, Subscription subscription)
-    {
-        if (id != subscription.Id) return BadRequest();
-        subscription.TenantId = _context.CurrentTenantId;
-        _context.Entry(subscription).State = EntityState.Modified;
-
-        try { await _context.SaveChangesAsync(); }
-        catch (DbUpdateConcurrencyException)
+        public SubscriptionsController(SubscriptionService subscriptionService)
         {
-            if (!_context.Subscriptions.Any(s => s.Id == id)) return NotFound();
-            throw;
+            _subscriptionService = subscriptionService;
         }
 
-        return NoContent();
-    }
+        [HttpGet]
+        public ActionResult<List<SubscriptionDto>> GetAll()
+        {
+            var subs = _subscriptionService.GetAllSubscriptions();
+            var dto = subs.Select(s => new SubscriptionDto
+            {
+                Id = s.Id,
+                PlanId = s.PlanId,
+                TenantId = s.TenantId,
+                StartDate = s.StartDate,
+                EndDate = s.EndDate
+            }).ToList();
+            return Ok(dto);
+        }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteSubscription(Guid id)
-    {
-        var subscription = await _context.Subscriptions
-            .FirstOrDefaultAsync(s => s.Id == id);
-        if (subscription == null) return NotFound();
+        [HttpGet("{id}")]
+        public ActionResult<SubscriptionDto> GetById(Guid id)
+        {
+            var sub = _subscriptionService.GetSubscriptionById(id);
+            if (sub == null) return NotFound();
 
-        _context.Subscriptions.Remove(subscription);
-        await _context.SaveChangesAsync();
-        return NoContent();
+            return new SubscriptionDto
+            {
+                Id = sub.Id,
+                PlanId = sub.PlanId,
+                TenantId = sub.TenantId,
+                StartDate = sub.StartDate,
+                EndDate = sub.EndDate
+            };
+        }
+
+        [HttpPost]
+        public ActionResult<SubscriptionDto> Create([FromBody] CreateSubscriptionDto dto)
+        {
+            var sub = _subscriptionService.CreateSubscription(dto.PlanId, dto.StartDate, dto.EndDate);
+
+            return CreatedAtAction(nameof(GetById), new { id = sub.Id }, new SubscriptionDto
+            {
+                Id = sub.Id,
+                PlanId = sub.PlanId,
+                TenantId = sub.TenantId,
+                StartDate = sub.StartDate,
+                EndDate = sub.EndDate
+            });
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Update(Guid id, [FromBody] CreateSubscriptionDto dto)
+        {
+            var sub = _subscriptionService.GetSubscriptionById(id);
+            if (sub == null) return NotFound();
+
+            sub.PlanId = dto.PlanId;
+            sub.StartDate = dto.StartDate;
+            sub.EndDate = dto.EndDate;
+            _subscriptionService.UpdateSubscription(sub);
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(Guid id)
+        {
+            var sub = _subscriptionService.GetSubscriptionById(id);
+            if (sub == null) return NotFound();
+
+            _subscriptionService.DeleteSubscription(sub);
+            return NoContent();
+        }
     }
 }

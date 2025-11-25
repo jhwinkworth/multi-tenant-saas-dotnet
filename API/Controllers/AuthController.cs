@@ -22,7 +22,9 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
+        // MUST disable query filters
         var user = await _context.Users
+            .IgnoreQueryFilters()
             .FirstOrDefaultAsync(u => u.Email == request.Email);
 
         if (user == null || !VerifyPassword(request.Password, user.PasswordHash))
@@ -59,7 +61,7 @@ public class AuthController : ControllerBase
 
     private bool VerifyPassword(string password, string hash)
     {
-        // Replace with real hashing check
+        // TODO — use real hashing
         return password == hash;
     }
 }
