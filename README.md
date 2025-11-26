@@ -33,7 +33,7 @@ A **work-in-progress** multi-tenant SaaS backend built with ASP.NET Core 8, demo
   - xUnit + FluentAssertions  
 
 - **Ready for CI/CD**  
-  - Can integrate GitHub Actions for automated test runs  
+  - Can integrate GitHub Actions or similar for automated test runs  
 
 ---
 
