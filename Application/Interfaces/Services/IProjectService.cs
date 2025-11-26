@@ -7,7 +7,7 @@ namespace Application.Interfaces.Services
 {
     public interface IProjectService
     {
-        public Project CreateProject(string name, Guid tenantId);
+        public Project CreateProject(string name);
         public List<Project> GetAllProjects();
         public Project? GetProjectById(Guid id);
         public void UpdateProject(Project project);

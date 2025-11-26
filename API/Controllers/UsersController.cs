@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Application.Services;
 using Domain.Entities;
+using Application.Interfaces.Services;
+using Application.DTOs.User;
 
 namespace Api.Controllers
 {
@@ -8,9 +10,9 @@ namespace Api.Controllers
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
 
-        public UsersController(UserService userService)
+        public UsersController(IUserService userService)
         {
             _userService = userService;
         }
@@ -23,6 +25,7 @@ namespace Api.Controllers
             {
                 Id = u.Id,
                 Email = u.Email,
+                PasswordHash = u.PasswordHash,
                 IsAdmin = u.IsAdmin,
                 TenantId = u.TenantId
             }).ToList();
@@ -39,27 +42,29 @@ namespace Api.Controllers
             {
                 Id = user.Id,
                 Email = user.Email,
+                PasswordHash = user.PasswordHash,
                 IsAdmin = user.IsAdmin,
                 TenantId = user.TenantId
             };
         }
 
         [HttpPost]
-        public ActionResult<UserDto> Register([FromBody] RegisterUserDto dto)
+        public ActionResult<UserDto> Create([FromBody] CreateUserDto dto)
         {
-            var user = _userService.RegisterUser(dto.Email, dto.IsAdmin);
+            var user = _userService.CreateUser(dto.Email, dto.PasswordHash, dto.IsAdmin);
 
             return CreatedAtAction(nameof(GetById), new { id = user.Id }, new UserDto
             {
                 Id = user.Id,
                 Email = user.Email,
+                PasswordHash = user.PasswordHash,
                 IsAdmin = user.IsAdmin,
                 TenantId = user.TenantId
             });
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(Guid id, [FromBody] RegisterUserDto dto)
+        public IActionResult Update(Guid id, [FromBody] CreateUserDto dto)
         {
             var user = _userService.GetUserById(id);
             if (user == null) return NotFound();

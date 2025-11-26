@@ -37,4 +37,28 @@ public class TaskItemTests
 
         Assert.Equal("Test Task", task.Title);
     }
+
+    [Fact]
+    public void TaskItem_CanStoreDescription()
+    {
+        var task = new TaskItem
+        {
+            Id = Guid.NewGuid(),
+            Description = "This is a test task."
+        };
+
+        Assert.Equal("This is a test task.", task.Description);
+    }
+
+    [Fact]
+    public void TaskItem_ShouldStoreIsCompleted()
+    {
+        var task = new TaskItem
+        {
+            Id = Guid.NewGuid(),
+            IsCompleted = true
+        };
+
+        Assert.True(task.IsCompleted);
+    }
 }

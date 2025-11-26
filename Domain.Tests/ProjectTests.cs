@@ -33,4 +33,17 @@ public class ProjectTests
 
         Assert.Equal("Test Name", project.Name);
     }
+
+    [Fact]
+    public void Project_CanStoreDescription()
+    {
+        var project = new Project
+        {
+            Id = Guid.NewGuid(),
+            TenantId = Guid.NewGuid(),
+            Description = "Project 1"
+        };
+
+        Assert.Equal("Project 1", project.Description);
+    }
 }

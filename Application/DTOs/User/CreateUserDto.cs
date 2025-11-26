@@ -1,8 +1,7 @@
 ﻿namespace Application.DTOs.User
 {
-    public class UserDto
+    public class CreateUserDto
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
         public Guid TenantId { get; set; }
         public string Email { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;

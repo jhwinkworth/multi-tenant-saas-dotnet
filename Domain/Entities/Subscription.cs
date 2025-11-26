@@ -10,6 +10,5 @@ public class Subscription
     public DateTime? EndDate { get; set; }
 
     // Navigation
-    public Tenant Tenant { get; set; }
     public Plan Plan { get; set; }
 }

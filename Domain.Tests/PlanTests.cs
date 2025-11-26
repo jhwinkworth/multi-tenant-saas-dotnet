@@ -18,7 +18,7 @@ public class PlanTests
     }
 
     [Fact]
-    public void Plan_ShouldStorePrice()
+    public void Plan_ShouldStorePricePerMonth()
     {
         var p = new Plan
         {
@@ -27,5 +27,29 @@ public class PlanTests
         };
 
         Assert.Equal(29.99m, p.PricePerMonth);
+    }
+
+    [Fact]
+    public void Plan_CanStoreDescription()
+    {
+        var p = new Plan
+        {
+            Id = Guid.NewGuid(),
+            Description = "Premium"
+        };
+
+        Assert.Equal("Premium", p.Description);
+    }
+
+    [Fact]
+    public void Plan_ShouldStoreIsActive()
+    {
+        var p = new Plan
+        {
+            Id = Guid.NewGuid(),
+            IsActive = false
+        };
+
+        Assert.False(p.IsActive);
     }
 }

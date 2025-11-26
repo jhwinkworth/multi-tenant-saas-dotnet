@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Application.DTOs.TaskItem;
+using Application.Interfaces.Services;
 using Application.Services;
-using Application.DTOs.TaskItem;
 using Domain.Entities;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
 {
@@ -9,9 +10,9 @@ namespace Api.Controllers
     [Route("api/[controller]")]
     public class TaskItemsController : ControllerBase
     {
-        private readonly TaskItemService _taskService;
+        private readonly ITaskItemService _taskService;
 
-        public TaskItemsController(TaskItemService taskService)
+        public TaskItemsController(ITaskItemService taskService)
         {
             _taskService = taskService;
         }

@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Application.DTOs.Project;
+using Application.Interfaces.Services;
 using Application.Services;
-using Application.DTOs.Project;
 using Domain.Entities;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
 {
@@ -9,9 +10,9 @@ namespace Api.Controllers
     [Route("api/[controller]")]
     public class ProjectsController : ControllerBase
     {
-        private readonly ProjectService _projectService;
+        private readonly IProjectService _projectService;
 
-        public ProjectsController(ProjectService projectService)
+        public ProjectsController(IProjectService projectService)
         {
             _projectService = projectService;
         }
@@ -25,7 +26,8 @@ namespace Api.Controllers
             {
                 Id = p.Id,
                 Name = p.Name,
-                TenantId = p.TenantId
+                TenantId = p.TenantId,
+                CreatedAt = p.CreatedAt
             }).ToList();
 
             return Ok(dto);
@@ -37,35 +39,25 @@ namespace Api.Controllers
             var project = _projectService.GetProjectById(id);
             if (project == null) return NotFound();
 
-            return new ProjectDto
-            {
-                Id = project.Id,
-                Name = project.Name,
-                TenantId = project.TenantId
-            };
+            return Ok(project);
         }
 
         [HttpPost]
-        public ActionResult<ProjectDto> Create([FromBody] CreateProjectDto dto)
+        public ActionResult<ProjectDto> Create(CreateProjectDto dto)
         {
-            var tenantIdClaim = User.Claims.FirstOrDefault(c => c.Type == "TenantId")?.Value;
-
-            if (tenantIdClaim == null)
-                return Unauthorized("TenantId claim missing in token.");
-
-            var tenantId = Guid.Parse(tenantIdClaim);
-
-            var project = _projectService.CreateProject(dto.Name, tenantId);
+            var project = _projectService.CreateProject(dto.Name);
 
             var result = new ProjectDto
             {
                 Id = project.Id,
                 Name = project.Name,
-                TenantId = project.TenantId
+                TenantId = project.TenantId,
+                CreatedAt = project.CreatedAt
             };
 
-            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+            return CreatedAtAction(nameof(GetById), new { id = project.Id }, result);
         }
+
 
 
         [HttpPut("{id}")]

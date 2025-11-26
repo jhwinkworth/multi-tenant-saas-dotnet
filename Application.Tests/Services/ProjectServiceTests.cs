@@ -1,67 +1,89 @@
-﻿using Xunit;
-using Moq;
-using Application.Services;
+﻿using Application.Interfaces;
 using Application.Interfaces.Repositories;
+using Application.Services;
 using Domain.Entities;
+using FluentAssertions;
+using Moq;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using FluentAssertions;
+using Xunit;
 
 namespace Application.Tests.Services
 {
     public class ProjectServiceTests
     {
-        private readonly Mock<IProjectRepository> _projectRepoMock;
-        private readonly ProjectService _projectService;
+        private readonly Mock<IProjectRepository> _mockRepo;
+        private readonly Mock<ITenantProvider> _mockTenantProvider;
+        private readonly ProjectService _service;
+
+        private readonly Guid _tenantId = Guid.NewGuid();
 
         public ProjectServiceTests()
         {
-            _projectRepoMock = new Mock<IProjectRepository>();
-            _projectService = new ProjectService(_projectRepoMock.Object);
+            _mockRepo = new Mock<IProjectRepository>();
+            _mockTenantProvider = new Mock<ITenantProvider>();
+
+            _mockTenantProvider.Setup(t => t.TenantId).Returns(_tenantId);
+
+            _service = new ProjectService(_mockRepo.Object, _mockTenantProvider.Object);
         }
 
         [Fact]
-        public void CreateProject_ShouldReturnProject_WithTenantId()
+        public void CreateProject_ShouldSetTenantId_AndReturnProject()
         {
             // Arrange
-            var tenantId = Guid.NewGuid();
-            _projectRepoMock.Setup(r => r.Add(It.IsAny<Project>()))
+            var name = "New Project";
+            Project? capturedProject = null;
+
+            _mockRepo
+                .Setup(r => r.Add(It.IsAny<Project>()))
+                .Callback<Project>(p => capturedProject = p)
                 .Returns((Project p) => p);
 
             // Act
-            var project = _projectService.CreateProject("Test Project", tenantId);
+            var result = _service.CreateProject(name);
 
             // Assert
-            project.Name.Should().Be("Test Project");
-            project.TenantId.Should().Be(tenantId);
-            _projectRepoMock.Verify(r => r.Add(It.IsAny<Project>()), Times.Once);
+            capturedProject.Should().NotBeNull();
+            capturedProject!.Name.Should().Be(name);
+            capturedProject.TenantId.Should().Be(_tenantId);
+
+            result.Should().Be(capturedProject);
         }
+
 
         [Fact]
         public void GetAllProjects_ShouldReturnProjects()
         {
+            // Arrange
             var projects = new List<Project>
             {
-                new Project { Id = Guid.NewGuid(), Name = "P1", TenantId = Guid.NewGuid() },
-                new Project { Id = Guid.NewGuid(), Name = "P2", TenantId = Guid.NewGuid() }
+                new Project { Id = Guid.NewGuid(), Name = "P1", TenantId = _tenantId },
+                new Project { Id = Guid.NewGuid(), Name = "P2", TenantId = _tenantId }
             };
-            _projectRepoMock.Setup(r => r.GetAllForTenant()).Returns(projects);
+            _mockRepo.Setup(r => r.GetAllForTenant()).Returns(projects);
 
-            var result = _projectService.GetAllProjects();
+            // Act
+            var result = _service.GetAllProjects();
 
-            result.Count.Should().Be(2);
+            // Assert
+            result.Should().BeEquivalentTo(projects);
         }
 
         [Fact]
         public void GetProjectById_ShouldReturnProject_WhenExists()
         {
+            // Arrange
             var projectId = Guid.NewGuid();
-            var project = new Project { Id = projectId, Name = "P1", TenantId = Guid.NewGuid() };
-            _projectRepoMock.Setup(r => r.GetById(projectId)).Returns(project);
+            var project = new Project { Id = projectId, Name = "P1", TenantId = _tenantId };
+            _mockRepo.Setup(r => r.GetById(projectId)).Returns(project);
 
-            var result = _projectService.GetProjectById(projectId);
+            // Act
+            var result = _service.GetProjectById(projectId);
 
+            // Assert
             result.Should().NotBeNull();
             result!.Id.Should().Be(projectId);
         }
@@ -69,17 +91,27 @@ namespace Application.Tests.Services
         [Fact]
         public void UpdateProject_ShouldCallRepo()
         {
+            // Arrange
             var project = new Project { Id = Guid.NewGuid(), Name = "Old Name" };
-            _projectService.UpdateProject(project);
-            _projectRepoMock.Verify(r => r.Update(project), Times.Once);
+
+            // Act
+            _service.UpdateProject(project);
+
+            // Assert
+            _mockRepo.Verify(r => r.Update(project), Times.Once);
         }
 
         [Fact]
         public void DeleteProject_ShouldCallRepo()
         {
+            // Arrange
             var project = new Project { Id = Guid.NewGuid(), Name = "P1" };
-            _projectService.DeleteProject(project);
-            _projectRepoMock.Verify(r => r.Delete(project), Times.Once);
+
+            // Act
+            _service.DeleteProject(project);
+
+            // Assert
+            _mockRepo.Verify(r => r.Delete(project), Times.Once);
         }
     }
 }

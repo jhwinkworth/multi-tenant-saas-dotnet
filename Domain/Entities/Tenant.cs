@@ -9,5 +9,5 @@ public class Tenant
     // Navigation properties
     public ICollection<User> Users { get; set; } = new List<User>();
     public ICollection<Project> Projects { get; set; } = new List<Project>();
-    public ICollection<Subscription> Subscriptions { get; set; }
+    public ICollection<Subscription> Subscriptions { get; set; } = new List<Subscription>();
 }

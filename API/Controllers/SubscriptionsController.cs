@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Application.DTOs.Subscription;
+using Application.Interfaces.Services;
 using Application.Services;
-using Application.DTOs.Subscription;
 using Domain.Entities;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
 {
@@ -9,9 +10,9 @@ namespace Api.Controllers
     [Route("api/[controller]")]
     public class SubscriptionsController : ControllerBase
     {
-        private readonly SubscriptionService _subscriptionService;
+        private readonly ISubscriptionService _subscriptionService;
 
-        public SubscriptionsController(SubscriptionService subscriptionService)
+        public SubscriptionsController(ISubscriptionService subscriptionService)
         {
             _subscriptionService = subscriptionService;
         }

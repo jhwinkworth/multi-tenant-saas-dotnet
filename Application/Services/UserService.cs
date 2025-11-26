@@ -18,7 +18,7 @@ namespace Application.Services
             _tenantProvider = tenantProvider;
         }
 
-        public User RegisterUser(string email, bool isAdmin)
+        public User CreateUser(string email, string PasswordHash, bool isAdmin)
         {
             if (string.IsNullOrWhiteSpace(email))
                 throw new ArgumentException("Email cannot be empty");
@@ -27,6 +27,7 @@ namespace Application.Services
             {
                 Id = Guid.NewGuid(),
                 Email = email,
+                PasswordHash = PasswordHash,
                 IsAdmin = isAdmin,
                 TenantId = _tenantProvider.TenantId
             };

@@ -8,7 +8,4 @@ public class User
     public string PasswordHash { get; set; } = string.Empty;
     public string FullName { get; set; } = string.Empty;
     public bool IsAdmin { get; set; } = false;
-
-    // Navigation
-    public Tenant Tenant { get; set; }
 }

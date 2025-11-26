@@ -1,32 +1,28 @@
-﻿using Application.Interfaces.Repositories;
+﻿using Application.Interfaces;
+using Application.Interfaces.Repositories;
+using Application.Interfaces.Services;
 using Domain.Entities;
 using System;
 using System.Collections.Generic;
-using Application.Interfaces.Services;
 
 namespace Application.Services
 {
     public class ProjectService : IProjectService
     {
         private readonly IProjectRepository _projectRepository;
+        private readonly ITenantProvider _tenantProvider;
 
-        public ProjectService(IProjectRepository projectRepository)
+        public ProjectService(IProjectRepository projectRepository, ITenantProvider tenantProvider)
         {
             _projectRepository = projectRepository;
+            _tenantProvider = tenantProvider;
         }
 
-        public Project CreateProject(string name, Guid tenantId)
+        public Project CreateProject(string name)
         {
-            if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("Project name cannot be empty");
+            var tenantId = _tenantProvider.TenantId;
 
-            var project = new Project
-            {
-                Id = Guid.NewGuid(),
-                Name = name,
-                TenantId = tenantId
-            };
-
+            var project = new Project { Id = Guid.NewGuid(), Name = name, TenantId = tenantId };
             return _projectRepository.Add(project);
         }
 

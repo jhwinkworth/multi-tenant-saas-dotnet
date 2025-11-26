@@ -8,7 +8,7 @@ namespace Application.Interfaces.Services
 {
     public interface IUserService
     {
-        public User RegisterUser(string email, bool isAdmin);
+        public User CreateUser(string email, string PasswordHash, bool isAdmin);
         public List<User> GetAllUsers();
         public User? GetUserById(Guid id);
         public void UpdateUser(User user);

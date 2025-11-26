@@ -2,6 +2,7 @@
 using Application.Services;
 using Application.DTOs.Plan;
 using Domain.Entities;
+using Application.Interfaces.Services;
 
 namespace Api.Controllers
 {
@@ -9,9 +10,9 @@ namespace Api.Controllers
     [Route("api/[controller]")]
     public class PlansController : ControllerBase
     {
-        private readonly PlanService _planService;
+        private readonly IPlanService _planService;
 
-        public PlansController(PlanService planService)
+        public PlansController(IPlanService planService)
         {
             _planService = planService;
         }
