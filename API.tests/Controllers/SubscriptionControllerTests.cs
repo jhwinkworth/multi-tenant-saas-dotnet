@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace API.tests.Controllers
+namespace API.Tests.Controllers
 {
     internal class SubscriptionControllerTests
     {

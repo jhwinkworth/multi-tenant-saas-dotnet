@@ -26,7 +26,7 @@ namespace Api.Controllers
             {
                 Id = p.Id,
                 Name = p.Name,
-                TenantId = p.TenantId,
+                Description = p.Description,
                 CreatedAt = p.CreatedAt
             }).ToList();
 
@@ -51,7 +51,7 @@ namespace Api.Controllers
             {
                 Id = project.Id,
                 Name = project.Name,
-                TenantId = project.TenantId,
+                Description = project.Description,
                 CreatedAt = project.CreatedAt
             };
 
@@ -67,6 +67,8 @@ namespace Api.Controllers
             if (project == null) return NotFound();
 
             project.Name = dto.Name;
+            project.Description = dto.Description;
+            project.CreatedAt = dto.CreatedAt;
             _projectService.UpdateProject(project);
 
             return NoContent();

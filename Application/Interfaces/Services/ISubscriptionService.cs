@@ -8,7 +8,7 @@ namespace Application.Interfaces.Services
 {
     public interface ISubscriptionService
     {
-        public Subscription CreateSubscription(Guid planId, DateTime start, DateTime end);
+        public Subscription CreateSubscription(Guid planId, DateTime start, DateTime? end);
         public List<Subscription> GetAllSubscriptions();
         public Subscription? GetSubscriptionById(Guid id);
         public void UpdateSubscription(Subscription subscription);

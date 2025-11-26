@@ -17,7 +17,7 @@ namespace Application.Services
             _projectRepository = projectRepository;
         }
 
-        public TaskItem CreateTask(string title, Guid projectId, DateTime? dueDate = null)
+        public TaskItem CreateTaskItem(string title, Guid projectId, DateTime createdAt, DateTime? dueDate = null)
         {
             if (string.IsNullOrWhiteSpace(title))
                 throw new ArgumentException("Task title cannot be empty");
@@ -32,6 +32,7 @@ namespace Application.Services
                 Title = title,
                 ProjectId = projectId,
                 Project = project,
+                CreatedAt = createdAt,
                 DueDate = dueDate
             };
 

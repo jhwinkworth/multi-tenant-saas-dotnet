@@ -18,16 +18,15 @@ namespace Api.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<UserDto>> GetAll()
+        public ActionResult<List<UserDto>> GetAllUsers()
         {
             var users = _userService.GetAllUsers();
             var dto = users.Select(u => new UserDto
             {
                 Id = u.Id,
                 Email = u.Email,
-                PasswordHash = u.PasswordHash,
-                IsAdmin = u.IsAdmin,
-                TenantId = u.TenantId
+                FullName = u.FullName,
+                IsAdmin = u.IsAdmin
             }).ToList();
             return Ok(dto);
         }
@@ -42,34 +41,34 @@ namespace Api.Controllers
             {
                 Id = user.Id,
                 Email = user.Email,
-                PasswordHash = user.PasswordHash,
-                IsAdmin = user.IsAdmin,
-                TenantId = user.TenantId
+                FullName = user.FullName,
+                IsAdmin = user.IsAdmin
             };
         }
 
         [HttpPost]
-        public ActionResult<UserDto> Create([FromBody] CreateUserDto dto)
+        public ActionResult<UserDto> CreateUser([FromBody] CreateUserDto dto)
         {
-            var user = _userService.CreateUser(dto.Email, dto.PasswordHash, dto.IsAdmin);
+            var user = _userService.CreateUser(dto.Email, dto.Password, dto.FullName, dto.IsAdmin);
 
             return CreatedAtAction(nameof(GetById), new { id = user.Id }, new UserDto
             {
                 Id = user.Id,
                 Email = user.Email,
-                PasswordHash = user.PasswordHash,
+                FullName = user.FullName,
                 IsAdmin = user.IsAdmin,
-                TenantId = user.TenantId
             });
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(Guid id, [FromBody] CreateUserDto dto)
+        public IActionResult UpdateUser(Guid id, [FromBody] CreateUserDto dto)
         {
             var user = _userService.GetUserById(id);
             if (user == null) return NotFound();
 
             user.Email = dto.Email;
+            user.PasswordHash = dto.Password;
+            user.FullName = dto.FullName;
             user.IsAdmin = dto.IsAdmin;
             _userService.UpdateUser(user);
 
@@ -77,7 +76,7 @@ namespace Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(Guid id)
+        public IActionResult DeleteUser(Guid id)
         {
             var user = _userService.GetUserById(id);
             if (user == null) return NotFound();

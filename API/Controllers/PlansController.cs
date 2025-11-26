@@ -26,6 +26,7 @@ namespace Api.Controllers
                 Id = p.Id,
                 Name = p.Name,
                 PricePerMonth = p.PricePerMonth,
+                Description = p.Description,
                 IsActive = p.IsActive
             }).ToList();
             return Ok(dto);
@@ -42,6 +43,7 @@ namespace Api.Controllers
                 Id = plan.Id,
                 Name = plan.Name,
                 PricePerMonth = plan.PricePerMonth,
+                Description = plan.Description,
                 IsActive = plan.IsActive
             };
         }
@@ -49,13 +51,14 @@ namespace Api.Controllers
         [HttpPost]
         public ActionResult<PlanDto> Create([FromBody] CreatePlanDto dto)
         {
-            var plan = _planService.CreatePlan(dto.Name, dto.PricePerMonth, dto.IsActive);
+            var plan = _planService.CreatePlan(dto.Name, dto.PricePerMonth, dto.Description, dto.IsActive);
 
             return CreatedAtAction(nameof(GetById), new { id = plan.Id }, new PlanDto
             {
                 Id = plan.Id,
                 Name = plan.Name,
                 PricePerMonth = plan.PricePerMonth,
+                Description = plan.Description,
                 IsActive = plan.IsActive
             });
         }
@@ -68,6 +71,7 @@ namespace Api.Controllers
 
             plan.Name = dto.Name;
             plan.PricePerMonth = dto.PricePerMonth;
+            plan.Description = dto.Description;
             plan.IsActive = dto.IsActive;
 
             _planService.UpdatePlan(plan);

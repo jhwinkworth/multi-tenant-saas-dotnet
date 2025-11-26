@@ -3,28 +3,38 @@ using Application.Interfaces.Services;
 using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using FluentAssertions;
+using Application.DTOs.Plan;
 
-public class PlansControllerTests
+namespace API.Tests.Controller
 {
-    private readonly Mock<IPlanService> _service;
-    private readonly PlansController _controller;
-
-    public PlansControllerTests()
+    public class PlansControllerTests
     {
-        _service = new Mock<IPlanService>();
-        _controller = new PlansController(_service.Object);
-    }
+        private readonly Mock<IPlanService> _service;
+        private readonly PlansController _controller;
 
-    [Fact]
-    public void GetAllPlans_ShouldReturnOk()
-    {
-        var plans = new List<Plan> { new Plan { Id = Guid.NewGuid(), Name = "Pro" } };
-        _service.Setup(s => s.GetAllPlans()).Returns(plans);
+        public PlansControllerTests()
+        {
+            _service = new Mock<IPlanService>();
+            _controller = new PlansController(_service.Object);
+        }
 
-        var result = _controller.GetAll();
+        [Fact]
+        public void GetAllPlans_ShouldReturnOk()
+        {
+            // Arrange
+            var plans = new List<Plan> { new Plan { Id = Guid.NewGuid(), Name = "Pro" } };
+            _service.Setup(s => s.GetAllPlans()).Returns(plans);
 
-        var ok = result as OkObjectResult;
-        ok.Should().NotBeNull();
-        ok.Value.Should().BeEquivalentTo(plans);
+            // Act
+            var result = _controller.GetAll();
+
+            // Assert
+            var expectedDto = new List<PlanDto> { new PlanDto { Id = plans[0].Id, Name = "Pro" } };
+
+            var ok = result.Result as OkObjectResult;
+            ok.Should().NotBeNull();
+            ok.Value.Should().BeEquivalentTo(expectedDto);
+        }
     }
 }

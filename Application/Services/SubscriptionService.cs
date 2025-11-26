@@ -18,7 +18,7 @@ namespace Application.Services
             _tenantProvider = tenantProvider;
         }
 
-        public Subscription CreateSubscription(Guid planId, DateTime start, DateTime end)
+        public Subscription CreateSubscription(Guid planId, DateTime start, DateTime? end)
         {
             if (end <= start)
                 throw new ArgumentException("Subscription end date must be after start date");

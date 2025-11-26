@@ -25,7 +25,6 @@ namespace Api.Controllers
             {
                 Id = s.Id,
                 PlanId = s.PlanId,
-                TenantId = s.TenantId,
                 StartDate = s.StartDate,
                 EndDate = s.EndDate
             }).ToList();
@@ -42,7 +41,6 @@ namespace Api.Controllers
             {
                 Id = sub.Id,
                 PlanId = sub.PlanId,
-                TenantId = sub.TenantId,
                 StartDate = sub.StartDate,
                 EndDate = sub.EndDate
             };
@@ -57,7 +55,6 @@ namespace Api.Controllers
             {
                 Id = sub.Id,
                 PlanId = sub.PlanId,
-                TenantId = sub.TenantId,
                 StartDate = sub.StartDate,
                 EndDate = sub.EndDate
             });

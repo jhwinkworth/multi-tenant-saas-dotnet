@@ -32,7 +32,7 @@ namespace Application.Tests.Services
         {
             _userRepoMock.Setup(r => r.Add(It.IsAny<User>())).Returns((User u) => u);
 
-            var result = _userService.CreateUser("test@example.com", TODO, false);
+            var result = _userService.CreateUser("test@example.com", "1234", "Bob Mortimer", false);
 
             result.TenantId.Should().Be(_tenantId);
             result.Email.Should().Be("test@example.com");

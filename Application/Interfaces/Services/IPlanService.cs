@@ -9,7 +9,7 @@ namespace Application.Interfaces.Services
 {
     public interface IPlanService
     {
-        Plan CreatePlan(string name, decimal pricePerMonth, bool isActive = true);
+        Plan CreatePlan(string name, decimal pricePerMonth, string Description, bool isActive = true);
         List<Plan> GetAllPlans();
         Plan? GetPlanById(Guid id);
         void UpdatePlan(Plan plan);

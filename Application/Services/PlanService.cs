@@ -18,7 +18,7 @@ namespace Application.Services
             _subscriptionRepository = subscriptionRepository;
         }
 
-        public Plan CreatePlan(string name, decimal pricePerMonth, bool isActive = true)
+        public Plan CreatePlan(string name, decimal pricePerMonth, string description, bool isActive = true)
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Plan name cannot be empty");
             if (pricePerMonth < 0) throw new ArgumentException("Plan price must be positive");
@@ -28,7 +28,8 @@ namespace Application.Services
                 Id = Guid.NewGuid(),
                 Name = name,
                 PricePerMonth = pricePerMonth,
-                IsActive = isActive
+                Description = description,
+                IsActive = isActive,
             };
 
             return _planRepository.Add(plan);

@@ -26,10 +26,29 @@ namespace Api.Controllers
                 Id = t.Id,
                 Title = t.Title,
                 ProjectId = t.ProjectId,
+                Description = t.Description,
+                IsCompleted = t.IsCompleted,
                 DueDate = t.DueDate
             }).ToList();
             return Ok(dto);
         }
+
+        [HttpGet("project/{projectId}")]
+        public ActionResult<List<TaskItemDto>> GetForProject(Guid projectId)
+        {
+            var tasks = _taskService.GetTasksForProject(projectId);  // filtered by project
+            var dto = tasks.Select(t => new TaskItemDto
+            {
+                Id = t.Id,
+                Title = t.Title,
+                ProjectId = t.ProjectId,
+                Description = t.Description,
+                IsCompleted = t.IsCompleted,
+                DueDate = t.DueDate
+            }).ToList();
+            return Ok(dto);
+        }
+
 
         [HttpGet("{id}")]
         public ActionResult<TaskItemDto> GetById(Guid id)
@@ -42,6 +61,8 @@ namespace Api.Controllers
                 Id = task.Id,
                 Title = task.Title,
                 ProjectId = task.ProjectId,
+                Description = task.Description,
+                IsCompleted = task.IsCompleted,
                 DueDate = task.DueDate
             };
         }
@@ -49,13 +70,15 @@ namespace Api.Controllers
         [HttpPost]
         public ActionResult<TaskItemDto> Create([FromBody] CreateTaskItemDto dto)
         {
-            var task = _taskService.CreateTask(dto.Title, dto.ProjectId, dto.DueDate);
+            var task = _taskService.CreateTaskItem(dto.Title, dto.ProjectId, dto.CreatedAt, dto.DueDate);
 
             return CreatedAtAction(nameof(GetById), new { id = task.Id }, new TaskItemDto
             {
                 Id = task.Id,
                 Title = task.Title,
                 ProjectId = task.ProjectId,
+                Description = task.Description,
+                IsCompleted = task.IsCompleted,
                 DueDate = task.DueDate
             });
         }
@@ -68,6 +91,9 @@ namespace Api.Controllers
 
             task.Title = dto.Title;
             task.DueDate = dto.DueDate;
+            task.ProjectId = dto.ProjectId;
+            task.Description = dto.Description;
+            task.IsCompleted = dto.IsCompleted;
             _taskService.UpdateTask(task);
 
             return NoContent();

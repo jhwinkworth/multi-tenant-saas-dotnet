@@ -18,8 +18,9 @@ namespace Application.Services
             _tenantProvider = tenantProvider;
         }
 
-        public User CreateUser(string email, string PasswordHash, bool isAdmin)
+        public User CreateUser(string email, string password, string fullName, bool isAdmin = false)
         {
+            var hashedPassword = HashPassword(password);
             if (string.IsNullOrWhiteSpace(email))
                 throw new ArgumentException("Email cannot be empty");
 
@@ -27,7 +28,8 @@ namespace Application.Services
             {
                 Id = Guid.NewGuid(),
                 Email = email,
-                PasswordHash = PasswordHash,
+                PasswordHash = hashedPassword,
+                FullName = fullName,
                 IsAdmin = isAdmin,
                 TenantId = _tenantProvider.TenantId
             };
@@ -50,6 +52,12 @@ namespace Application.Services
         public void DeleteUser(User user)
         {
             _userRepository.Delete(user);
+        }
+
+        public string HashPassword(string password)
+        {
+            // Implement a secure password hashing mechanism here
+            return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(password)); // Placeholder example
         }
     }
 }

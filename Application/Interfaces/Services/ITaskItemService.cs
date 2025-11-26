@@ -7,7 +7,7 @@ namespace Application.Interfaces.Services
 {
     public interface ITaskItemService
     {
-        public TaskItem CreateTask(string title, Guid projectId, DateTime? dueDate = null);
+        public TaskItem CreateTaskItem(string title, Guid projectId, DateTime createdAt, DateTime? dueDate = null);
         public List<TaskItem> GetAllTasks();
         public List<TaskItem> GetTasksForProject(Guid projectId);
         public TaskItem? GetTaskById(Guid id);

@@ -32,7 +32,7 @@ namespace Application.Tests.Services
             _projectRepoMock.Setup(p => p.GetById(projectId)).Returns(project);
             _taskItemRepoMock.Setup(r => r.Add(It.IsAny<TaskItem>())).Returns((TaskItem t) => t);
 
-            var task = _taskItemService.CreateTask("New Task", projectId, DateTime.UtcNow.AddDays(1));
+            var task = _taskItemService.CreateTaskItem("New Task", projectId, DateTime.UtcNow.AddDays(1));
 
             task.Title.Should().Be("New Task");
             task.ProjectId.Should().Be(projectId);

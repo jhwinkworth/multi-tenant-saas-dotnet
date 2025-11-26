@@ -33,7 +33,7 @@ namespace Application.Tests.Services
                 .Returns((Plan p) => p);
 
             // Act
-            var plan = _planService.CreatePlan(name, price);
+            var plan = _planService.CreatePlan(name, price, "A plan");
 
             // Assert
             plan.Name.Should().Be(name);
@@ -45,7 +45,7 @@ namespace Application.Tests.Services
         [Fact]
         public void CreatePlan_ShouldThrow_WhenPriceNegative()
         {
-            Action act = () => _planService.CreatePlan("Plan", -10);
+            Action act = () => _planService.CreatePlan("Plan", -10, "A plan");
             act.Should().Throw<ArgumentException>().WithMessage("Plan price must be positive");
         }
 
